@@ -1,4 +1,4 @@
-## Experiment for Magellan
+## Experiment for Simba
 
 
 ## How to submit the query

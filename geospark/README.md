@@ -1,29 +1,25 @@
-![GeoSpark Logo](https://github.com/DataSystemsLab/GeoSpark/blob/master/GeoSpark_logo.png?raw=true)
+## Experiment for GeoSpark
 
-|     Stable    | Latest | Source code|
-|:-------------:|:------|:------:|
-|[![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/org.datasyslab/geospark.svg)](http://datasystemslab.github.io/GeoSpark/download/GeoSpark-All-Modules-Maven-Central-Coordinates/) | [![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/https/oss.sonatype.org/org.datasyslab/geospark.svg)](http://datasystemslab.github.io/GeoSpark/download/GeoSpark-All-Modules-Maven-Central-Coordinates/) | [![Build Status](https://travis-ci.org/DataSystemsLab/GeoSpark.svg?branch=master)](https://travis-ci.org/DataSystemsLab/GeoSpark)|
+All GeoSpark function calls are put in **/core/src/main/scala/org/datasyslab/geospark/showcase/GeoSparkExperiment**
 
-[GeoSpark@Twitter](https://twitter.com/GeoSpark_ASU) || [GeoSpark Discussion Board](https://groups.google.com/forum/#!forum/geospark-discussion-board) || [![Join the chat at https://gitter.im/geospark-datasys/Lobby](https://badges.gitter.im/geospark-datasys/Lobby.svg)](https://gitter.im/geospark-datasys/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) || [![HitCount](http://hits.dwyl.io/DataSystemsLab/GeoSpark.svg)](http://hits.dwyl.io/DataSystemsLab/GeoSpark)(since Jan. 2018)
+There are around 35 queries with different GeoSpark settings (index, spatial partitoining, etc...).
 
-GeoSpark is listed as **Infrastructure Project** on [**Apache Spark Official Third Party Project Page**](http://spark.apache.org/third-party-projects.html)
+Please change the parameters like range query windows, knn query point in **GeoSparkExperiment** file.
 
-GeoSpark is a cluster computing system for processing large-scale spatial data. GeoSpark extends Apache Spark / SparkSQL with a set of out-of-the-box Spatial Resilient Distributed Datasets (SRDDs)/ SpatialSQL that efficiently load, process, and analyze large-scale spatial data across machines.
+## How to submit the query
 
-GeoSpark contains three modules:
+1. compile in the `core` folder: `mvn clean install -DskipTests`
+2. Take the binary jar in `core/target` folder: geospark-1.1.3.jar
+3. Run `./spark-submit geospark-1.1.3.jar --master spark://YOURIP:7077 queryname inputfile1 outputfile`
 
-| Name  |  API |  Spark compatibility|Dependency|
-|---|---|---|---|
-| GeoSpark-core  | RDD  | Spark 2.X/1.X  | Spark-core|
-| GeoSpark-SQL  | SQL/DataFrame  | SparkSQL 2.1 and later | Spark-core, Spark-SQL, GeoSpark-core|
-|  GeoSpark-Viz |  RDD | Spark 2.X/1.X |Spark-core, GeoSpark-core|
+Example1: `./spark-submit geospark-1.1.3.jar --master spark://YOURIP:7077 nycpointrange hdfs://nyctaxi/pickuponly/* hdfs://nyctaxi/rangequeryresult`
 
-* Core: GeoSpark SpatialRDDs and Query Operators. 
-* SQL: SQL interfaces for GeoSpark core.
-* Viz: Visualization extension of GeoSpark core.
+This will run a range query on nyctaxi point type data. It uses no index.
 
-**Please visit [GeoSpark website](http://datasystemslab.github.io/GeoSpark/) for details and documentations.**
+Example2: `./spark-submit geospark-1.1.3.jar --master spark://YOURIP:7077 nycpointknn hdfs://nyctaxi/pickuponly/*`
 
-## News!
-* GeoSpark 1.1.0 is released. This release contains new SQL functions, custom Quad-Tree/R-Tree index serializers and bug fixes. GeoSpark 1.1.0 supposrt Apache Spark 2.3. **Note, GeoSparkSQL Maven Coordinate changed** [Release notes](http://datasystemslab.github.io/GeoSpark/download/GeoSpark-All-Modules-Release-notes/) || [Maven Coordinate](http://datasystemslab.github.io/GeoSpark/download/GeoSpark-All-Modules-Maven-Central-Coordinates/) (Thanks for the index serializer patch contributed by Zongsi Zhang!)
-* GeoSpark wiki is now moved to [GeoSpark new website](http://datasystemslab.github.io/GeoSpark/)! Users are welcome to contribute your tutorials and stories by making a PR!
+This will run a KNN query on nyctaxi point type data. KNN query is printed to stdout directly since it is small enough. It uses no index.
+
+Example3: `./spark-submit geospark-1.1.3.jar --master spark://YOURIP:7077 pointjoinkdb hdfs://nyctaxi/pickuponly/* hdfs://postal_codes_wkt hdfs://nyctaxi/joinqueryresult`
+
+This will run a range join query on nyctaxi point type data and osm postal codes data. It uses KDB-Tree partitioning and no index.
